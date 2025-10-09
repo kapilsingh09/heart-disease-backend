@@ -18,16 +18,14 @@ app = FastAPI(
 # ✅ CORS Configuration
 # --------------------------
 # Read ALLOWED_ORIGINS from environment variable
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
-if ALLOWED_ORIGINS:
-    ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
-else:
-    # Default: only allow localhost for safety
-    ALLOWED_ORIGINS = ["http://localhost:3000"]
-
+# ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+origins = [
+    "http://localhost:5173",   # for local React app
+    "https://heart-disease-frontend.onrender.com",  # your deployed frontend (replace with your actual URL)
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
