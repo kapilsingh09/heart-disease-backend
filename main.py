@@ -123,3 +123,7 @@ def predict(data: HeartInput):
         # In production, log the error and return a generic message
         print(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail="Prediction failed. Please try again later.")
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
