@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # --------------------------
-# ✅ Initialize FastAPI App
+# Initialize FastAPI App
 # --------------------------
 app = FastAPI(
     title="Heart Disease Prediction API",
@@ -15,21 +15,12 @@ app = FastAPI(
 )
 
 # --------------------------
-# ✅ CORS Configuration
+# CORS Configuration
 # --------------------------
-# Read ALLOWED_ORIGINS from environment variable
-# ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
-env_origins = os.getenv("ALLOWED_ORIGINS")
-if env_origins:
-    origins = [o.strip() for o in env_origins.split(",") if o.strip()]
-else:
-    # Default allowed origins for local/dev and deployed frontends
-    origins = [
-        "http://localhost:5173",  # for local React app
-        "https://heart-disease-frontend.onrender.com",  # your deployed frontend (replace if needed)
-        "https://heart-disease-predection.vercel.app",  # Vercel frontend (as provided)
-        "https://heart-disease-backend-4-g3m1.onrender.com",  # Render frontend origin that sends requests
-    ]
+origins = [
+    "http://localhost:5173",  # Local React frontend
+    "https://heart-disease-predection.vercel.app",  # Deployed frontend
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,13 +31,11 @@ app.add_middleware(
 )
 
 # --------------------------
-# ✅ Load Model, Scaler, Columns
+# Load Model, Scaler, Columns
 # --------------------------
-MODEL_PATH = "knn_heart.pkl"
-SCALER_PATH = "scaler.pkl"
-COLUMNS_PATH = "columns.pkl"
-
-model, scaler, expected_columns = None, None, None
+MODEL_PATH = "knn_heart_model.pkl"
+SCALER_PATH = "heart_scaler.pkl"
+COLUMNS_PATH = "heart_columns.pkl"
 
 try:
     model = joblib.load(MODEL_PATH)
@@ -55,9 +44,10 @@ try:
     print("✅ Model, Scaler, and Columns loaded successfully.")
 except Exception as e:
     print(f"⚠️ Error loading model or artifacts: {e}")
+    model, scaler, expected_columns = None, None, None
 
 # --------------------------
-# ✅ Input Schema
+# Input Schema
 # --------------------------
 class HeartInput(BaseModel):
     Age: int
@@ -73,7 +63,7 @@ class HeartInput(BaseModel):
     ST_Slope: str
 
 # --------------------------
-# ✅ API Routes
+# API Routes
 # --------------------------
 @app.get("/")
 def root():
@@ -88,7 +78,7 @@ def options_root():
     return Response(status_code=200)
 
 # --------------------------
-# ✅ Prediction Endpoint
+# Prediction Endpoint
 # --------------------------
 @app.post("/predict")
 def predict(data: HeartInput):
@@ -99,7 +89,7 @@ def predict(data: HeartInput):
         )
 
     try:
-        # Validation for categorical fields
+        # Validate categorical fields
         valid_sex = {"M", "F"}
         valid_chest_pain = {"ATA", "NAP", "TA", "ASY"}
         valid_resting_ecg = {"Normal", "ST", "LVH"}
@@ -157,9 +147,10 @@ def predict(data: HeartInput):
         raise HTTPException(status_code=500, detail="Prediction failed due to server error.")
 
 # --------------------------
-# ✅ Run App (Local / Render)
+# Run App
 # --------------------------
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
+    print(f"🚀 Server running on port {port}")
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False)
