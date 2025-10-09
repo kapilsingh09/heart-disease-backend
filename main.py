@@ -10,8 +10,8 @@ app = FastAPI()
 
 # CORS configuration for production
 # In production, set allowed origins to your frontend domain(s)
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "https://your-frontend-domain.com").split(",")
-
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
+# ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,  # Set this to your frontend domain(s) in production
@@ -65,6 +65,7 @@ def predict(data: HeartInput):
         valid_exercise_angina = {"Y", "N"}
         valid_st_slope = {"Up", "Flat", "Down"}
 
+
         if data.Sex not in valid_sex:
             raise HTTPException(status_code=400, detail="Invalid value for Sex.")
         if data.ChestPainType not in valid_chest_pain:
@@ -75,6 +76,7 @@ def predict(data: HeartInput):
             raise HTTPException(status_code=400, detail="Invalid value for ExerciseAngina.")
         if data.ST_Slope not in valid_st_slope:
             raise HTTPException(status_code=400, detail="Invalid value for ST_Slope.")
+
 
         # Create raw input
         raw_input = {
