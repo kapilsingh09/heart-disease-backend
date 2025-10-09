@@ -19,10 +19,18 @@ app = FastAPI(
 # --------------------------
 # Read ALLOWED_ORIGINS from environment variable
 # ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS")
-origins = [
-    "http://localhost:5173",   # for local React app
-    "https://heart-disease-frontend.onrender.com",  # your deployed frontend (replace with your actual URL)
-]
+env_origins = os.getenv("ALLOWED_ORIGINS")
+if env_origins:
+    origins = [o.strip() for o in env_origins.split(",") if o.strip()]
+else:
+    # Default allowed origins for local/dev and deployed frontends
+    origins = [
+        "http://localhost:5173",  # for local React app
+        "https://heart-disease-frontend.onrender.com",  # your deployed frontend (replace if needed)
+        "https://heart-disease-predection.vercel.app",  # Vercel frontend (as provided)
+        "https://heart-disease-backend-4-g3m1.onrender.com",  # Render frontend origin that sends requests
+    ]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
